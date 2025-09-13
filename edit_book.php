@@ -3,26 +3,47 @@ session_start();
 require_once "config.php";
 
 // Only allow admin
-if (!isset($_SESSION['email']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['email'])) {
     header("Location: index.php");
     exit();
 }
 
+if (!isset($_GET['id'])) {
+    header("Location: admin_page.php?page=books");
+    exit();
+}
+
+$book_id = intval($_GET['id']);
 $message = "";
+
+// Fetch current book data
+$stmt = $conn->prepare("SELECT * FROM books WHERE id = ?");
+$stmt->bind_param("i", $book_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    $_SESSION['message'] = "Book not found.";
+    header("Location: admin_page.php?page=books");
+    exit();
+}
+
+$book = $result->fetch_assoc();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title  = trim($_POST['title']);
     $author = trim($_POST['author']);
 
     if (!empty($title) && !empty($author)) {
-        $stmt = $conn->prepare("INSERT INTO books (title, author, status) VALUES (?, ?, 'available')");
-        $stmt->bind_param("ss", $title, $author);
-        if ($stmt->execute()) {
-            $_SESSION['message'] = "Book added successfully!";
+        $update = $conn->prepare("UPDATE books SET title = ?, author = ? WHERE id = ?");
+        $update->bind_param("ssi", $title, $author, $book_id);
+
+        if ($update->execute()) {
+            $_SESSION['message'] = "Book updated successfully!";
             header("Location: admin_page.php?page=books");
             exit();
         } else {
-            $message = "Error adding book.";
+            $message = "Error updating book.";
         }
     } else {
         $message = "Please fill in all fields.";
@@ -34,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Book - Admin</title>
+  <title>Edit Book - Admin</title>
   <style>
     body { font-family: Arial, sans-serif; background: #f9f9f9; }
     .form-container {
@@ -59,17 +80,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 
 <div class="form-container">
-    <h2>➕ Add New Book</h2>
+    <h2>✏️ Edit Book</h2>
     <?php if (!empty($message)) echo "<p class='msg'>$message</p>"; ?>
 
     <form method="POST">
         <label for="title">Book Title:</label>
-        <input type="text" id="title" name="title" required>
+        <input type="text" id="title" name="title" value="<?= htmlspecialchars($book['title']); ?>" required>
 
         <label for="author">Author:</label>
-        <input type="text" id="author" name="author" required>
+        <input type="text" id="author" name="author" value="<?= htmlspecialchars($book['author']); ?>" required>
 
-        <button type="submit">Add Book</button>
+        <button type="submit">Update Book</button>
     </form>
 
     <a class="back-link" href="admin_page.php?page=books">⬅ Back to Books</a>
