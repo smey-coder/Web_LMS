@@ -1,27 +1,27 @@
 <?php
 session_start();
-require_once "config.php"; // database connection
+require_once "config.php";
 
 if (!isset($_SESSION['email'])) {
     header("Location: index.php");
     exit();
 }
 
-// Get user info
+// User info
 $user_email = $_SESSION['email'];
 $user_name = $_SESSION['name'];
 
-// Fetch available books
-$books_result = $conn->query("SELECT * FROM books WHERE status = 'Available'");
-
-// Fetch borrowed books by this user
+// Fetch books
+$books_result = $conn->query("SELECT * FROM books WHERE status = 'available'");
 $borrowed_result = $conn->query("
-    SELECT b.title, b.author, br.borrow_date, br.due_date 
-    FROM borrowbook br
+    SELECT b.id, b.title, b.author, br.borrow_date, br.due_date 
+    FROM borrowed_books br
     JOIN books b ON br.book_id = b.id
     WHERE br.user_email = '$user_email'
 ");
 
+// Active page (from menu)
+$page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,63 +29,119 @@ $borrowed_result = $conn->query("
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard - Library</title>
-    <link rel="stylesheet" href="style.css">
     <style>
-        body { background: #f9f9f9; font-family: Arial, sans-serif; }
-        .container { width: 90%; margin: auto; }
-        h1 { text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
-        th { background: #333; color: #fff; }
-        .logout-btn { background: #e74c3c; color: white; padding: 10px; border: none; cursor: pointer; }
-        .logout-btn:hover { background: #c0392b; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            background: #f4f6f8;
+        }
+        .sidebar {
+            width: 220px;
+            background: #2c3e50;
+            color: white;
+            min-height: 100vh;
+            padding-top: 20px;
+            position: fixed;
+        }
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+        .sidebar a:hover {
+            background: #34495e;
+        }
+        .content {
+            margin-left: 220px;
+            padding: 20px;
+            width: 100%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        th {
+            background: #333;
+            color: #fff;
+        }
+        .logout {
+            background: #e74c3c;
+            border: none;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .logout:hover {
+            background: #c0392b;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📚 Library Management System</h1>
-        <h2>Welcome, <?= htmlspecialchars($user_name); ?> (<?= htmlspecialchars($user_email); ?>)</h2>
-        <button class="logout-btn" onclick="window.location.href='logout.php'">Logout</button>
+    <!-- Sidebar Menu -->
+    <div class="sidebar">
+        <h2>📚 Library</h2>
+        <a href="user_page.php?page=dashboard">🏠 Dashboard</a>
+        <a href="user_page.php?page=books">📖 Available Books</a>
+        <a href="user_page.php?page=borrowed">📂 My Borrowed Books</a>
+        <a href="user_page.php?page=profile">👤 Profile</a>
+        <form action="logout.php" method="post">
+            <button class="logout" type="submit">🚪 Logout</button>
+        </form>
+    </div>
 
-        <h3>Available Books</h3>
-        <table>
-            <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Action</th>
-            </tr>
-            <?php while($row = $books_result->fetch_assoc()): ?>
-            <tr>
-                <td><?= htmlspecialchars($row['title']); ?></td>
-                <td><?= htmlspecialchars($row['author']); ?></td>
-                <td>
-                    <a href="borrow.php?id=<?= $row['id']; ?>">Borrow</a>
-                </td>
-            </tr>
-            <?php endwhile; ?>
-        </table>
+    <!-- Main Content -->
+    <div class="content">
+        <?php if ($page == "dashboard"): ?>
+            <h1>Welcome, <?= htmlspecialchars($user_name); ?> 👋</h1>
+            <p>This is your <b>dashboard</b>. Use the menu to navigate.</p>
 
-        <h3>Your Borrowed Books</h3>
-        <table>
-            <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Borrow Date</th>
-                <th>Due Date</th>
-                <th>Action</th>
-            </tr>
-            <?php while($row = $borrowed_result->fetch_assoc()): ?>
-            <tr>
-                <td><?= htmlspecialchars($row['title']); ?></td>
-                <td><?= htmlspecialchars($row['author']); ?></td>
-                <td><?= htmlspecialchars($row['borrow_date']); ?></td>
-                <td><?= htmlspecialchars($row['due_date']); ?></td>
-                <td>
-                    <a href="return.php?title=<?= urlencode($row['title']); ?>">Return</a>
-                </td>
-            </tr>
-            <?php endwhile; ?>
-        </table>
+        <?php elseif ($page == "books"): ?>
+            <h1>📖 Available Books</h1>
+            <table>
+                <tr><th>Title</th><th>Author</th><th>Action</th></tr>
+                <?php while($row = $books_result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['title']); ?></td>
+                    <td><?= htmlspecialchars($row['author']); ?></td>
+                    <td><a href="borrow.php?id=<?= $row['id']; ?>">Borrow</a></td>
+                </tr>
+                <?php endwhile; ?>
+            </table>
+
+        <?php elseif ($page == "borrowed"): ?>
+            <h1>📂 My Borrowed Books</h1>
+            <table>
+                <tr><th>Title</th><th>Author</th><th>Borrow Date</th><th>Due Date</th><th>Action</th></tr>
+                <?php while($row = $borrowed_result->fetch_assoc()): ?>
+                <tr>
+                    <td><?= htmlspecialchars($row['title']); ?></td>
+                    <td><?= htmlspecialchars($row['author']); ?></td>
+                    <td><?= htmlspecialchars($row['borrow_date']); ?></td>
+                    <td><?= htmlspecialchars($row['due_date']); ?></td>
+                    <td><a href="return.php?id=<?= $row['id']; ?>">Return</a></td>
+                </tr>
+                <?php endwhile; ?>
+            </table>
+
+        <?php elseif ($page == "profile"): ?>
+            <h1>👤 My Profile</h1>
+            <p><b>Name:</b> <?= htmlspecialchars($user_name); ?></p>
+            <p><b>Email:</b> <?= htmlspecialchars($user_email); ?></p>
+        <?php endif; ?>
     </div>
 </body>
 </html>
