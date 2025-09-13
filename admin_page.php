@@ -54,7 +54,18 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 <?php
 if ($page == 'home') {
     echo "<h2>Dashboard</h2>";
-    echo "<p>Use the menu to manage books, users, and borrowing records.</p>";
+    echo "<p>This is page for Admin manager</p>";
+
+    // Show image
+    echo '
+        <img src="image/Library-Management-System_admin.webp" width="1000" height="600" style="
+            border-radius: 10px;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+        ">
+    ';
 }
 
 // ------------------- Manage Books -------------------

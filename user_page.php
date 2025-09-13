@@ -106,8 +106,18 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
     <!-- Main Content -->
     <div class="content">
         <?php if ($page == "dashboard"): ?>
-            <h1>Welcome, <?= htmlspecialchars($user_name); ?> 👋</h1>
+            <h1>Welcome, user<?= htmlspecialchars($user_name); ?> 👋</h1>
             <p>This is your <b>dashboard</b>. Use the menu to navigate.</p>
+            <img src="image/LMS.jpg" width="1000" height="600">
+            <style>
+                img {
+                    border-radius: 10px;
+                    max-width: 100%;
+                    height: auto;
+                    display: block;
+                    margin: 0 auto;
+                }
+            </style>
 
         <?php elseif ($page == "books"): ?>
             <h1>📖 Available Books</h1>
