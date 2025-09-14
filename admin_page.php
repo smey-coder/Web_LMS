@@ -20,19 +20,114 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - Library</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; }
-    header { background: #2c3e50; color: #fff; padding: 15px; text-align: center; }
-    nav { background: #34495e; display: flex; justify-content: center; }
-    nav a {
-        color: white; padding: 14px 20px; text-decoration: none; display: block;
-    }
-    nav a:hover { background: #1abc9c; }
-    .container { width: 90%; margin: auto; padding: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-    th { background: #333; color: #fff; }
-    .logout { background: #e74c3c; padding: 8px 14px; color: white; border-radius: 5px; }
-    .logout:hover { background: #c0392b; }
+     body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+  }
+
+  header {
+      background: #2c3e50;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+  }
+
+  nav {
+      background: #34495e;
+      display: flex;
+      flex-wrap: wrap; /* allows wrapping on small screens */
+      justify-content: center;
+  }
+
+  nav a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+  }
+
+  nav a:hover {
+      background: #1abc9c;
+  }
+
+  .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+      box-sizing: border-box;
+  }
+
+  table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+  }
+
+  th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+      word-wrap: break-word; /* wrap long text on mobile */
+  }
+
+  th {
+      background: #333;
+      color: #fff;
+  }
+
+  .logout {
+      background: #e74c3c;
+      padding: 8px 14px;
+      color: white;
+      border-radius: 5px;
+  }
+
+  .logout:hover {
+      background: #c0392b;
+  }
+
+  img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 20px auto;
+      border-radius: 10px;
+  }
+
+  /* ---------------- Responsive Design ---------------- */
+  @media (max-width: 768px) {
+      nav a {
+          padding: 12px 10px;
+          font-size: 14px;
+      }
+
+      th, td {
+          padding: 8px;
+          font-size: 14px;
+      }
+  }
+
+  @media (max-width: 480px) {
+      header h1 {
+          font-size: 18px;
+      }
+
+      nav a {
+          flex: 1 1 100%; /* full-width links */
+      }
+
+      th, td {
+          font-size: 12px;
+          padding: 6px;
+      }
+
+      .container {
+          padding: 10px;
+      }
+  }
   </style>
 </head>
 <body>

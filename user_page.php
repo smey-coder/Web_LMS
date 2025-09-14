@@ -34,6 +34,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
             margin: 0;
             font-family: Arial, sans-serif;
             display: flex;
+            font-size: 18px;
             background: #f4f6f8;
         }
         .sidebar {
@@ -88,6 +89,33 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
         .logout:hover {
             background: #c0392b;
         }
+        @media (max-width: 768px) {
+    body {
+        font-size: 16px;
+    }
+    }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+        body {
+            font-size: 14px;
+        }
+
+        .container {
+            width: 100%;
+            padding: 0 10px;
+        }
+    }
+    .container {
+    display: flex;
+    flex-wrap: wrap;
+    }
+
+    .item {
+        flex: 1 1 300px; /* Grow, shrink, base 300px */
+        margin: 10px;
+    }
+
     </style>
 </head>
 <body>
